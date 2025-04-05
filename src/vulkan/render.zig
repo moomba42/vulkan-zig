@@ -1490,18 +1490,24 @@ fn Renderer(comptime WriterType: type) type {
                 .device => "device",
             };
 
+            const loader_call = switch (dispatch_type) {
+                .base => "loader",
+                .instance => "loader",
+                .device => "loader.?"
+            };
+
             @setEvalBranchQuota(2000);
 
             try self.writer.print(
                 \\pub fn load({[params]s}) Self {{
                 \\    var self: Self = .{{ .dispatch = .{{}} }};
                 \\    inline for (std.meta.fields(Dispatch)) |field| {{
-                \\        const cmd_ptr = loader({[first_arg]s}, field.name.ptr) orelse undefined;
+                \\        const cmd_ptr = {[loader_call]s}({[first_arg]s}, field.name.ptr) orelse undefined;
                 \\        @field(self.dispatch, field.name) = @ptrCast(cmd_ptr);
                 \\    }}
                 \\    return self;
                 \\}}
-            , .{ .params = params, .first_arg = loader_first_arg });
+            , .{ .params = params, .first_arg = loader_first_arg, .loader_call = loader_call });
         }
 
         fn renderProxies(self: *Self) !void {
