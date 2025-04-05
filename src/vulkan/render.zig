@@ -1496,7 +1496,7 @@ fn Renderer(comptime WriterType: type) type {
                 \\pub fn load({[params]s}) Self {{
                 \\    var self: Self = .{{ .dispatch = .{{}} }};
                 \\    inline for (std.meta.fields(Dispatch)) |field| {{
-                \\        const cmd_ptr = loader({[first_arg]s}, field.name.ptr) orelse undefined;
+                \\        const cmd_ptr = loader.?({[first_arg]s}, field.name.ptr) orelse undefined;
                 \\        @field(self.dispatch, field.name) = @ptrCast(cmd_ptr);
                 \\    }}
                 \\    return self;
